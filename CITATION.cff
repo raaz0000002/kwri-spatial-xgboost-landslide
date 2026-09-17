@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this spatial machine learning workflow in your research, please cite it as below."
+title: "KWRI Spatial XGBoost Landslide Susceptibility Workflow"
+authors:
+  - family-names: "Basnet"
+    given-names: "Utkarsha"
+  - family-names: "KWRI Research Group"
+date-released: 2026-09-17
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/username/kwri-landslide-susceptibility"
+keywords:
+  - "landslide susceptibility mapping"
+  - "spatial autocorrelation"
+  - "spatial cross-validation"
+  - "xgboost"
+  - "geohazard risk assessment"
+  - "machine learning"
