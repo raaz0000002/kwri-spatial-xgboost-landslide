@@ -110,8 +110,8 @@ Clone the repository and install dependencies in a virtual environment:
 
 ```bash
 # Clone the repository
-git clone https://github.com/username/kwri-landslide-susceptibility.git
-cd kwri-landslide-susceptibility
+git clone https://github.com/raaz0000002/kwri-spatial-xgboost-landslide.git
+cd kwri-spatial-xgboost-landslide
 
 # Create and activate virtual environment
 python -m venv venv
@@ -220,7 +220,7 @@ If you use this spatial machine learning workflow, code, or methodology in your 
   year         = {2026},
   version      = {1.0.0},
   publisher    = {GitHub},
-  url          = {https://github.com/username/kwri-landslide-susceptibility}
+  url          = {https://github.com/raaz0000002/kwri-spatial-xgboost-landslide}
 }
 ```
 

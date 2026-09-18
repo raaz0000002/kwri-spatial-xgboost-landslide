@@ -8,7 +8,7 @@ authors:
 date-released: 2026-09-17
 version: 1.0.0
 license: MIT
-repository-code: "https://github.com/username/kwri-landslide-susceptibility"
+repository-code: "https://github.com/raaz0000002/kwri-spatial-xgboost-landslide"
 keywords:
   - "landslide susceptibility mapping"
   - "spatial autocorrelation"
