@@ -1,71 +1,67 @@
-# Dataset Specification and Attribute Dictionary
+# Kavrepalanchowk Landslide Susceptibility Datasets
 
-This directory contains modeling datasets used for Landslide Susceptibility Mapping (LSM) within the Kentucky Water Resources Research Institute (KWRI) spatial study area.
-
----
-
-## 1. Demo Dataset (`sample_test_points.csv`)
-
-A synthetic, 120-row demo dataset is included in this repository to facilitate immediate dry-run testing, CI/CD pipeline validation, and code exploration without requiring access to proprietary GIS geodatabases.
+This directory contains the spatial modeling datasets, extracted raster values, and diagnostic tables for the Kavrepalanchowk District landslide susceptibility assessment (Nepal Middle Hills).
 
 ---
 
-## 2. Required Schema and Attribute Definitions
+## 1. Datasets Summary
 
-Every dataset passed into the pipeline must be a CSV file with the following required columns:
-
-| Column Name | Type | Description | Unit / Encoding |
-|:---|:---:|:---|:---|
-| `Labels` | `int` | **Target Variable**: Binary landslide occurrence label. | `0` = Non-Landslide, `1` = Landslide |
-| `POINT_X` | `float` | Projected Easting / Longitude coordinate. | Decimal degrees or UTM Easting |
-| `POINT_Y` | `float` | Projected Northing / Latitude coordinate. | Decimal degrees or UTM Northing |
-| `Curvature` | `float` | Total topographic surface curvature. | $m^{-1} \times 100$ |
-| `TWI` | `float` | Topographic Wetness Index ($\ln(a / \tan \beta)$). | Dimensionless |
-| `Dist_Road_KYTC_1` | `float` | Euclidean proximity to KYTC transportation infrastructure. | Meters |
-| `Plan_Curv` | `float` | Plan (horizontal) curvature perpendicular to slope direction. | $m^{-1} \times 100$ |
-| `Profile_Curv` | `float` | Profile (vertical) curvature in the direction of maximum slope. | $m^{-1} \times 100$ |
-| `Distan_to_Rivers` | `float` | Proximity to river and drainage networks. | Meters |
-| `Slope_KWRI` | `float` | Ground surface slope steepness. | Degrees |
-| `Aspect_KWRI` | `float` | Compass direction that a slope face faces. | Degrees ($0^\circ - 360^\circ$) |
-| `Rain_Mean_KWRI` | `float` | Long-term mean annual precipitation. | Millimeters (mm) |
-| `NDVI_Mean_KWRI` | `float` | Mean Normalized Difference Vegetation Index. | Dimensionless ($-1.0$ to $+1.0$) |
-| `Landcover_KWRI` | `int` / `float` | Categorical NLCD (National Land Cover Database) code. | See NLCD lookup table below |
+| File | Rows | Coordinates | Description |
+|:---|:---:|:---:|:---|
+| `samples_proj.csv` | 1,200 | Projected (UTM 45N: `E`, `N`) | **Primary Modeling Dataset**: 600 landslide points (September 2024 rainstorm event) + 600 non-landslide points with all 21 terrain, soil, rainfall, spectral, and proximity predictors. |
+| `samples_raster.csv` | 1,200 | Projected (UTM 45N: `E`, `N`) | Point dataset re-sampled directly from the aligned 30-m GeoTIFF raster stack. |
+| `sample_vs_raster.csv` | 20 | Summary Stats | Distribution comparison between sample table values and district raster values (min, max, mean, median, z-scores, percent out of bounds). |
+| `raster_diag.csv` | 21 | Summary Stats | Diagnostic summary of the 21 predictor rasters across Kavrepalanchowk. |
+| `out_extract_vs_table.csv` | 21 | Comparison Metrics | Point-wise comparison metrics (Pearson $r$, median absolute difference, ratio, categorical agreement). |
+| `sample_test_points.csv` | 120 | WGS84 (`POINT_X`, `POINT_Y`) | Legacy synthetic unit test dataset. |
 
 ---
 
-## 3. National Land Cover Database (NLCD) Classification Lookup
+## 2. Coordinate Reference System (CRS)
 
-The categorical predictor `Landcover_KWRI` follows standard USGS/MRLC NLCD numeric codes:
-
-| NLCD Code | Land Cover Category |
-|:---:|:---|
-| `-9999` | Missing / Unknown Land Cover Code |
-| `0` | NoData / Unclassified |
-| `11` | Open Water |
-| `12` | Perennial Ice/Snow |
-| `21` | Developed, Open Space |
-| `22` | Developed, Low Intensity |
-| `23` | Developed, Medium Intensity |
-| `24` | Developed, High Intensity |
-| `31` | Barren Land |
-| `41` | Deciduous Forest |
-| `42` | Evergreen Forest |
-| `43` | Mixed Forest |
-| `51` | Dwarf Scrub |
-| `52` | Shrub/Scrub |
-| `71` | Grassland/Herbaceous |
-| `72` | Sedge/Herbaceous |
-| `73` | Lichens |
-| `74` | Moss |
-| `81` | Pasture/Hay |
-| `82` | Cultivated Crops |
-| `90` | Woody Wetlands |
-| `95` | Emergent Herbaceous Wetlands |
+- **Geographic**: WGS 84 (`Lat`, `Long`), EPSG:4326
+- **Projected**: WGS 84 / UTM Zone 45N (`E`, `N`), **EPSG:32645**
+- **Extent**: Kavrepalanchowk District, Central Nepal Middle Hills:
+  - Easting ($E$): 342,142 m to 389,148 m
+  - Northing ($N$): 3,025,526 m to 3,069,966 m
 
 ---
 
-## 4. Preprocessing & Quality Notes
+## 3. Predictor Schema and Attribute Definitions
 
-- **Infinite Values**: Any positive (`+inf`) or negative (`-inf`) infinity values caused by GIS raster division (e.g. curvature calculation over flat terrain) are automatically trapped and replaced by fold-specific medians during preprocessing.
-- **Missing Values**: Numeric attributes are imputed using the **median of the active training fold** to prevent data leakage. Categorical land cover missing codes are mapped to `-9999` and encoded with dedicated one-hot columns.
-- **Coordinates**: Coordinates (`POINT_X`, `POINT_Y`) are used strictly for spatial cluster blocking (K-Means) and are never used as direct features in the tree splits, avoiding geographic coordinate memorization.
+| Predictor Family | Column Name in Data | Manuscript Name | Native Source & Resolution | Description |
+|:---|:---|:---|:---|:---|
+| **Target Variable** | `Landslide` | Landslide | Sentinel-2 Pre/Post Event (2024) | Binary classification label: `1` = Landslide failure, `0` = Non-landslide. |
+| **Terrain** | `Elevation` | Elevation | SRTM 1-arc-second (~30 m) | Ground elevation above sea level (meters). |
+| **Terrain** | `Slope` | Slope | SRTM DEM derivative (~30 m) | Ground slope inclination (degrees). |
+| **Terrain** | `Aspect` | Aspect / Northness, Eastness | SRTM DEM derivative (~30 m) | Converted to $\text{Northness} = \cos(\text{Aspect})$ and $\text{Eastness} = \sin(\text{Aspect})$ (flat terrain set to 0.0). |
+| **Terrain** | `TPI(Topographic Position Index)` | TPI | SRTM DEM derivative (~30 m) | Topographic Position Index measuring relative elevation vs neighbors. |
+| **Terrain** | `Roughness` | Roughness | SRTM DEM derivative (~30 m) | Difference between maximum and minimum elevation in 3x3 window. |
+| **Terrain** | `TRI(Topographic Ruggedness Index)` | TRI | SRTM DEM derivative (~30 m) | Mean of absolute elevation differences between focal cell and 8 neighbors. |
+| **Terrain** | `Curvature` | Curvature | SRTM DEM derivative (~30 m) | Total surface curvature ($m^{-1} \times 100$). Note: removed in Model T due to redundancy with TPI. |
+| **Hydrology** | `Flow Accumulation` | FlowAcc | HydroSHEDS / SRTM DEM | Upslope accumulated contributing area ($km^2$). |
+| **Hydrology** | `TWI` | TWI | SRTM DEM derivative | Topographic Wetness Index: $\ln(a / \tan \beta)$. |
+| **Soil Texture** | `Organic` | Organic | Survey Department of Nepal | Soil organic carbon content (%). |
+| **Soil Texture** | `Sand` | Sand | Survey Department of Nepal | Sand particle fraction (%). |
+| **Soil Texture** | `Slit` | Silt | Survey Department of Nepal | Silt particle fraction (%). |
+| **Soil Texture** | `Clay` | Clay | Survey Department of Nepal | Clay particle fraction (%). |
+| **Soil Class** | `Parent_soil` | ParentSoil | Survey Department of Nepal | Categorical soil class (`1` to `5`; `-9999` for unmapped/missing). |
+| **Rainfall** | `Monsoon_Cumulative_Rainfall` | Rainfall | CHIRPS v2.0 (0.05° resampled) | Total cumulative rainfall from June–September 2024 rainstorm (mm). |
+| **Spectral (Leakage)** | `MBI` | MBI | Sentinel-2 (Sept 2024) | Modified Bare Soil Index (post-event; dropped in Model T to eliminate target leakage). |
+| **Spectral (Leakage)** | `MNDWI` | MNDWI | Sentinel-2 (Sept 2024) | Modified Normalized Difference Water Index (post-event; dropped in Model T). |
+| **Spectral (Leakage)** | `EVI` | EVI | Sentinel-2 (Sept 2024) | Enhanced Vegetation Index (post-event; dropped in Model T). |
+| **Proximity** | `dist_building_m` | DistBuilding | Google Open Buildings v3 | Euclidean distance to nearest building footprint (meters). |
+| **Proximity** | `dist_river_m` | DistRiver | Survey Department Hydrography | Euclidean distance to nearest river / drainage stream (meters). |
+| **Proximity** | `dist_road_m` | DistRoad | OpenStreetMap (OSM) | Euclidean distance to nearest road centerline (meters). |
+
+---
+
+## 4. Sampling Design & Quality Checks
+
+1. **Class Balance**: 600 landslide points and 600 non-landslide points (1:1 balanced design).
+2. **Nearest-Neighbor Spacing**:
+   - Landslide-to-nearest non-landslide median distance: **1,314 m** (minimum 278 m).
+   - Within-class landslide nearest-neighbor median: **588.6 m** (only 3 pairs < 60 m, candidate multi-point scars).
+   - Within-class non-landslide nearest-neighbor median: **629.9 m**.
+3. **No Duplicate Rows**: 0 duplicate coordinates, 0 duplicate predictor vectors.
+4. **Leakage Protection**: Post-event spectral indices (`MBI`, `EVI`, `MNDWI`) reflect the barren ground created by the landslide scars themselves rather than predisposing geo-environmental conditions; Model T strictly drops these to prevent target leakage.

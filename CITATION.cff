@@ -1,18 +1,22 @@
 cff-version: 1.2.0
-message: "If you use this spatial machine learning workflow in your research, please cite it as below."
-title: "KWRI Spatial XGBoost Landslide Susceptibility Workflow"
+message: "If you use this spatial machine learning workflow, data, or revision code in your research, please cite it as below."
+title: "Spatially Validated Landslide Susceptibility Mapping in the Nepal Middle Hills: Sampling Bias, Spectral-Index Leakage and Training-Raster Consistency in Kavrepalanchowk District"
 authors:
   - family-names: "Basnet"
     given-names: "Utkarsha"
-  - family-names: "KWRI Research Group"
-date-released: 2026-09-17
-version: 1.0.0
+  - family-names: "Kavrepalanchowk Landslide Research Group"
+date-released: 2026-10-20
+version: 2.0.0
 license: MIT
 repository-code: "https://github.com/raaz0000002/kwri-spatial-xgboost-landslide"
 keywords:
   - "landslide susceptibility mapping"
   - "spatial autocorrelation"
   - "spatial cross-validation"
+  - "target leakage"
+  - "spectral indices"
+  - "area of applicability"
+  - "probability calibration"
   - "xgboost"
-  - "geohazard risk assessment"
-  - "machine learning"
+  - "Nepal Himalaya"
+  - "Kavrepalanchowk"

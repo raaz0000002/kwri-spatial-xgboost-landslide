@@ -83,5 +83,16 @@ outputs_KWRI_XGBoost/
 *.joblib
 !data/*.joblib
 
+# Generated models, rasters, and manuscript artifacts
+*.pkl
+out_*.pkl
+final_models*.pkl
+maps/
+figs/
+figs_doc/
+*.docx
+Supplementary_Tables.xlsx
+*.tif
+
 # Scratch directory
 scratch/

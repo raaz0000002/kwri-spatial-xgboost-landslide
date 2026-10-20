@@ -1,0 +1,32 @@
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+from figstyle import *
+fig,ax=plt.subplots(figsize=(6.9,5.4)); ax.set_xlim(0,100); ax.set_ylim(0,100); ax.axis('off')
+def box(x,y,w,h,t,fc='#f3f2ef',ec='#52514e',fs=6.8,bold=False):
+    ax.add_patch(FancyBboxPatch((x,y),w,h,boxstyle='round,pad=0.4,rounding_size=1.2',fc=fc,ec=ec,lw=1))
+    ax.text(x+w/2,y+h/2,t,ha='center',va='center',fontsize=fs,weight='bold' if bold else 'normal',wrap=True)
+def arr(x1,y1,x2,y2): ax.annotate('',xy=(x2,y2),xytext=(x1,y1),arrowprops=dict(arrowstyle='-|>',color='#52514e',lw=1))
+B='#dbe8f8'; O='#fde3d6'; G='#d6f0e5'
+box(2,88,30,9,'Inventory: 600 landslide +\n600 non-landslide points (2024)',B)
+box(36,88,30,9,'21 candidate predictors\n(DEM, soil, rainfall, spectral,\nproximity rasters)',B)
+box(70,88,28,9,'Training–raster audit:\nsoil legend, distribution\nshift, VIF (with intercept)',O)
+arr(17,88,17,82); arr(51,88,51,82); arr(84,88,84,82)
+box(2,72,96,9,'Spatial structure: Moran\'s I correlogram • block-size sensitivity (2–15 km, k-means)\n• coordinate-only baseline → choice of 10-km blocks',O)
+arr(50,72,50,66)
+ax.add_patch(FancyBboxPatch((2,22),96,43,boxstyle='round,pad=0.4,rounding_size=1.5',fc='white',ec='#2a78d6',lw=1.6))
+ax.text(4,62.5,'Outer loop: 5 spatial folds (10-km blocks) × 3 repeats → unbiased performance',fontsize=8,weight='bold',color='#2a78d6')
+box(5,46,28,13,'Outer-training data\n(≈80% of blocks)',B)
+box(5,26,28,13,'Outer-test fold\n(held-out blocks)\nnever used for any choice',G)
+ax.add_patch(FancyBboxPatch((37,26),58,33,boxstyle='round,pad=0.4,rounding_size=1.2',fc='#f8f7f4',ec='#eb6834',lw=1.2,ls='--'))
+ax.text(39,56.5,'Inner loop: 4 spatial folds within outer-training data',fontsize=6.8,weight='bold',color='#c4501f')
+box(39,44,26,10,'1. Predictor-set choice\n(all / no parent soil /\nVIF ≤ 10)')
+box(67,44,26,10,'2. Yeo–Johnson + scaling\nfitted per fold')
+box(39,30,26,10,'3. Random search\n(20 draws, ROC AUC)\nRF, XGBoost, GBM, SVM')
+box(67,30,26,10,'4. Platt calibration,\nensemble weights and\nstacker from inner OOF')
+arr(33,52,39,49); arr(65,49,67,49); arr(80,44,52,40); arr(65,35,67,35)
+arr(19,46,19,39)
+ax.text(19,24,'',fontsize=7)
+box(2,6,46,13,'Outer-fold metrics: AUC, PR-AUC, Brier,\nlog loss, MCC, calibration slope/intercept,\nDeLong + Holm, permutation importance,\nagreement and dispersion vs. error',G)
+box(52,6,46,13,'Locked pipeline refit on all 1200 samples\n→ raster inference (mapping only):\ncontinuous score, quintile classes,\ndispersion, agreement, AOA',B)
+arr(25,22,25,19); arr(75,22,75,19)
+save(fig,'Fig_workflow')
